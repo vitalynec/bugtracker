@@ -1,29 +1,36 @@
 use c9YdVqdx9s;
+
+drop table task;
+drop table project;
 create table project
 (
-  id             int primary key,
-  name           varchar(255),
-  description    varchar(255),
-  dateOfCreation timestamp not null default now()
-  #   dateOfLastModification timestamp not null default now()
+  id                        INT(5)                                NOT NULL AUTO_INCREMENT primary key,
+  name                      VARCHAR(255),
+  description               VARCHAR(255),
+  date_of_creation          TIMESTAMP                             NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  date_of_last_modification TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-ALTER TABLE project
-  CHANGE COLUMN `id` `id` INT(11) NOT NULL AUTO_INCREMENT;
+insert into project (name, description)
+VALUES ("Project0", "Project0"),
+       ("Project1", "Project1"),
+       ("Project2", "Project2"),
+       ("Project3", "Project3"),
+       ("Project4", "Project4");
 
 create table task
 (
-  id             int primary key,
-  # TODO: связать с таблицей проектов
-  projectID      int,
-  name           varchar(255),
-  description    varchar(255),
-  priority       int(1),
-  dateOfCreation timestamp not null default now(),
-  #   dateOfLastModification timestamp not null default now(),
-  status         ENUM ('NEW','IN_PROGRESS','CLOSE')
+  id                        INT(5)                                NOT NULL AUTO_INCREMENT primary key,
+  project_id                 INT REFERENCES `project` (`id`),
+  name                      VARCHAR(255),
+  description               VARCHAR(255),
+  priority                  INT(1),
+  date_of_creation          TIMESTAMP                             NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  date_of_last_modification TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  status                    ENUM ('NEW','IN_PROGRESS','CLOSE')    NOT NULL
 );
 
-ALTER TABLE `task`
-  ADD FOREIGN KEY (`projectID`)
-    REFERENCES `project`(`id`);
+INSERT INTO task(project_id, name, description, priority, status)
+VALUES (1, "Task1", "Task", 1, 'NEW'),
+       (2, "Task3", "Task", 2, 'IN_PROGRESS'),
+       (1, "Task2", "Task", 1, 'CLOSE');

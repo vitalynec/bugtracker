@@ -1,20 +1,31 @@
 package com.vitane.bugtracker.Entity;
 
-import lombok.Data;
+import lombok.*;
 import org.hibernate.annotations.Type;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import com.fasterxml.jackson.annotation.*;
 
 import javax.persistence.*;
-import java.util.Calendar;
+import java.io.Serializable;
+import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "Task")
 @Data
-public class Task {
+@AllArgsConstructor
+@NoArgsConstructor
+public class Task implements Serializable {
 
     @Id
     @GeneratedValue
+    @Column(nullable = false, updatable = false)
     private int id;
 
-    @ManyToOne
+    @ManyToOne()
+    @JoinColumn(name = "project_id", nullable = false)
+    @JsonManagedReference
     private Project project;
 
     private String name;
@@ -26,19 +37,16 @@ public class Task {
     @Column(nullable = false, updatable = false)
     @Temporal(javax.persistence.TemporalType.TIMESTAMP)
     @Type(type = "org.hibernate.type.LocalDateTimeType")
-    private Calendar dateOfCreation;
+    @CreationTimestamp
+    private LocalDateTime dateOfCreation;
 
     @Column(nullable = false)
     @Temporal(javax.persistence.TemporalType.TIMESTAMP)
     @Type(type = "org.hibernate.type.LocalDateTimeType")
-    private Calendar dateOfLastModification;
+    @UpdateTimestamp
+    private LocalDateTime dateOfLastModification;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Status status;
-}
-
-enum Status {
-    NEW,
-    IN_PROGRESS,
-    CLOSE
 }
