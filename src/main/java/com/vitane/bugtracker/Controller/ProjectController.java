@@ -82,10 +82,10 @@ public final class ProjectController {
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/{id}/tasks")
-    public ResponseEntity<List<Task>> getTaskListByProjectId(@PathVariable int id, @RequestParam(required = false, defaultValue = "1", value = "page") int page) {
+    public ResponseEntity<List<Task>> getTaskListByProjectId(@PathVariable int id, @RequestParam(required = false, defaultValue = "0", value = "page") int page) {
         List<Task> taskList = taskRepository.findByProject(
                 projectRepository.findProjectById(id),
-                PageRequest.of(page - 1, 10)).getContent();
+                PageRequest.of(page, 10)).getContent();
         if (taskList.isEmpty())
             return ResponseEntity.notFound().build();
         else

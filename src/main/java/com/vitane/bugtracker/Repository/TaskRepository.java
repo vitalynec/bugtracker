@@ -11,5 +11,7 @@ import org.springframework.stereotype.Repository;
 public interface TaskRepository extends PagingAndSortingRepository<Task, Integer> {
 
     Page<Task> findByProject(Project project, Pageable pageable);
+    Page<Task> findAllByOrderByPriority(Pageable pageable);
+    Page<Task> findAllByOrOrderByDateOfCreation(Pageable pageable);
     Task findTaskById(int id);
 }

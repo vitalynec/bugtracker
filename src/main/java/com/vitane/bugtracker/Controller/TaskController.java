@@ -26,19 +26,29 @@ public class TaskController {
     }
 
     //  REST API OK
-    @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<List<Task>> getAllTasks(@RequestParam(required = false, value = "page", defaultValue = "0") int page,
-                                                  @RequestParam(required = false, value = "sortByPrority", defaultValue = "false") boolean sortByPrority,
-                                                  @RequestParam(required = false, value = "sortByDate", defaultValue = "false") boolean sortByDate) {
+    @RequestMapping(method = RequestMethod.GET, params = {"page", "sort"})
+    public ResponseEntity<List<Task>> getAllTasks(@RequestParam(required = false, value = "page", defaultValue = "0") int page) {
+//                                                  @RequestParam(required = false, value = "sort", defaultValue = "none") String sort
         List<Task> taskList;
-        if (sortByPrority) {
-            PageRequest sortedByPriorityDesc = new PageRequest(page, 10, Sort.by("priority").descending());
-            taskList = taskRepository.findAll(sortedByPriorityDesc).getContent();
-        } else if (sortByDate) {
-            PageRequest sortedByDateDesc = new PageRequest(page, 10, Sort.by("dateOfCreation").descending());
-            taskList = taskRepository.findAll(sortedByDateDesc).getContent();
-        } else
-            taskList = taskRepository.findAll(PageRequest.of(page, 10)).getContent();
+
+/*      TODO: sort-type in switch is not working
+        switch (sort) {
+            case "PRIORITY": {
+//                PageRequest sortedByPriorityAsc = new PageRequest(page, 10, Sort.by("priority").ascending());
+//                taskList = taskRepository.findAll(sortedByPriorityAsc).getContent();
+                taskList = taskRepository.findAllByOrderByPriority(PageRequest.of(page, 10)).getContent();
+            }
+            case "DATE": {
+//                PageRequest sortedByDateAsc = new PageRequest(page, 10, Sort.by("dateOfCreation").ascending());
+//                taskList = taskRepository.findAll(sortedByDateAsc).getContent();
+                taskList = taskRepository.findAllByOrOrderByDateOfCreation(PageRequest.of(page, 10)).getContent();
+            }
+            default: {
+                taskList = taskRepository.findAll(PageRequest.of(page, 10)).getContent();
+            }
+        }*/
+
+        taskList = taskRepository.findAll(PageRequest.of(page, 10)).getContent();
 
         return responseTaskList(taskList);
     }
@@ -94,3 +104,5 @@ public class TaskController {
             return ResponseEntity.ok(taskList);
     }
 }
+
+
