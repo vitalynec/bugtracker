@@ -23,7 +23,7 @@ public class Task implements Serializable {
     @Column(nullable = false, updatable = false)
     private int id;
 
-    @ManyToOne()
+    @ManyToOne
     @JoinColumn(name = "project_id", nullable = false)
     @JsonManagedReference
     private Project project;
