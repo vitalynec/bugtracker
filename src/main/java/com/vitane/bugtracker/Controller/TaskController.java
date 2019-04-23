@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
-import java.util.List;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/tasks")
@@ -26,30 +26,30 @@ public class TaskController {
     }
 
     //  REST API OK
-    @RequestMapping(method = RequestMethod.GET, params = {"page", "sort"})
-    public ResponseEntity<List<Task>> getAllTasks(@RequestParam(required = false, value = "page", defaultValue = "0") int page) {
-//                                                  @RequestParam(required = false, value = "sort", defaultValue = "none") String sort
+    @RequestMapping(method = RequestMethod.GET)
+    public ResponseEntity<List<Task>> getAllTasks(@RequestParam Map<String, String> params) {
         List<Task> taskList;
+        int page = Integer.parseInt(params.getOrDefault("page", "0"));
+        String sort = params.getOrDefault("sort", "none");
 
-/*      TODO: sort-type in switch is not working
-        switch (sort) {
-            case "PRIORITY": {
+        switch (sort.toLowerCase()) {
+            case "priority": {
 //                PageRequest sortedByPriorityAsc = new PageRequest(page, 10, Sort.by("priority").ascending());
 //                taskList = taskRepository.findAll(sortedByPriorityAsc).getContent();
                 taskList = taskRepository.findAllByOrderByPriority(PageRequest.of(page, 10)).getContent();
+                break;
             }
-            case "DATE": {
+            case "date": {
 //                PageRequest sortedByDateAsc = new PageRequest(page, 10, Sort.by("dateOfCreation").ascending());
 //                taskList = taskRepository.findAll(sortedByDateAsc).getContent();
-                taskList = taskRepository.findAllByOrOrderByDateOfCreation(PageRequest.of(page, 10)).getContent();
+                taskList = taskRepository.findAllByOrderByDateOfCreation(PageRequest.of(page, 10)).getContent();
+                break;
             }
             default: {
                 taskList = taskRepository.findAll(PageRequest.of(page, 10)).getContent();
+                break;
             }
-        }*/
-
-        taskList = taskRepository.findAll(PageRequest.of(page, 10)).getContent();
-
+        }
         return responseTaskList(taskList);
     }
 
