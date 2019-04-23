@@ -12,6 +12,6 @@ public interface TaskRepository extends PagingAndSortingRepository<Task, Integer
 
     Page<Task> findByProject(Project project, Pageable pageable);
     Page<Task> findAllByOrderByPriority(Pageable pageable);
-    Page<Task> findAllByOrOrderByDateOfCreation(Pageable pageable);
+    Page<Task> findAllByOrderByDateOfCreation(Pageable pageable);
     Task findTaskById(int id);
 }
