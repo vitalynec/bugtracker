@@ -2,15 +2,18 @@ package com.vitane.bugtracker.Controller;
 
 import com.vitane.bugtracker.Entity.Status;
 import com.vitane.bugtracker.Entity.Task;
-import com.vitane.bugtracker.Repository.ProjectRepository;
+import com.vitane.bugtracker.Specification.TaskSpecification;
 import com.vitane.bugtracker.Repository.TaskRepository;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 
 @RestController
@@ -18,30 +21,25 @@ import java.util.*;
 public class TaskController {
 
     private TaskRepository taskRepository;
-    private ProjectRepository projectRepository;
 
-    TaskController(ProjectRepository projectRepository, TaskRepository taskRepository) {
+    TaskController(TaskRepository taskRepository) {
         this.taskRepository = taskRepository;
-        this.projectRepository = projectRepository;
     }
 
     //  REST API OK
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<List<Task>> getAllTasks(@RequestParam Map<String, String> params) {
         List<Task> taskList;
+
         int page = Integer.parseInt(params.getOrDefault("page", "0"));
         String sort = params.getOrDefault("sort", "none");
-
         switch (sort.toLowerCase()) {
             case "priority": {
-//                PageRequest sortedByPriorityAsc = new PageRequest(page, 10, Sort.by("priority").ascending());
-//                taskList = taskRepository.findAll(sortedByPriorityAsc).getContent();
+//                taskList = taskRepository.findAll( new PageRequest(page, 10, Sort.by("priority").ascending())).getContent();
                 taskList = taskRepository.findAllByOrderByPriority(PageRequest.of(page, 10)).getContent();
                 break;
             }
             case "date": {
-//                PageRequest sortedByDateAsc = new PageRequest(page, 10, Sort.by("dateOfCreation").ascending());
-//                taskList = taskRepository.findAll(sortedByDateAsc).getContent();
                 taskList = taskRepository.findAllByOrderByDateOfCreation(PageRequest.of(page, 10)).getContent();
                 break;
             }
@@ -50,6 +48,46 @@ public class TaskController {
                 break;
             }
         }
+
+//        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+//        String datef = params.getOrDefault("datef", "01012000");
+//        String datet = params.getOrDefault("datet", "31122020");
+//
+//        try {
+//            LocalDateTime dateFrom = LocalDateTime.ofInstant(dateFormat.parse(datef).toInstant(),
+//                    ZoneId.systemDefault());
+//            LocalDateTime dateTo = LocalDateTime.ofInstant(dateFormat.parse(datet).toInstant(),
+//                    ZoneId.systemDefault());
+
+            // GET param like /?filter=priority&ptype=0 or /?filter=status&stype=in_progress
+            String filter = params.getOrDefault("filter", "none");
+            Status statusType = Status.valueOf(params.getOrDefault("stype", "new").toUpperCase());
+            int priorityType = Integer.parseInt(params.getOrDefault("ptype", "0"));
+            switch (filter) {
+                case "status": {
+                    taskList = taskRepository.findAll(TaskSpecification.getTasksByStatus(statusType),
+                            PageRequest.of(page, 10)).getContent();
+                    break;
+                }
+                case "priority": {
+                    taskList = taskRepository.findAll(TaskSpecification.getTasksByPriority(priorityType),
+                            PageRequest.of(page, 10)).getContent();
+                    break;
+                }
+//                case "datet": {
+//                    taskList = taskRepository.findAll(TaskSpecification.getTasksByDateTo(dateTo),
+//                            PageRequest.of(page, 10)).getContent();
+//                    break;
+//                }
+                default: {
+                    taskList = taskRepository.findAll(PageRequest.of(page, 10)).getContent();
+                    break;
+                }
+            }
+//        } catch (ParseException e) {
+//            System.err.println(e.getMessage());
+//        }
+
         return responseTaskList(taskList);
     }
 
