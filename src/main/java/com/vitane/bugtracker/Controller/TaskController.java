@@ -44,50 +44,46 @@ public class TaskController {
                 break;
             }
             default: {
-                taskList = taskRepository.findAll(PageRequest.of(page, 10)).getContent();
-                break;
+                // GET param like /?filter=priority&ptype=0 or /?filter=status&stype=in_progress
+                String filter = params.getOrDefault("filter", "none");
+                switch (filter.toLowerCase()) {
+                    case "status": {
+                        Status statusType = Status.valueOf(params.getOrDefault("stype", "new").toUpperCase());
+                        taskList = taskRepository.findAll(TaskSpecification.getTasksByStatus(statusType),
+                                PageRequest.of(page, 10)).getContent();
+                        break;
+                    }
+                    case "priority": {
+                        int priorityType = Integer.parseInt(params.getOrDefault("ptype", "0"));
+                        taskList = taskRepository.findAll(TaskSpecification.getTasksByPriority(priorityType),
+                                PageRequest.of(page, 10)).getContent();
+                        break;
+                    }
+                    case "date": {
+                        SimpleDateFormat dateFormat = new SimpleDateFormat("ddMMyyyy");
+                        String datef = params.getOrDefault("datef", "01-01-2000");
+                        String datet = params.getOrDefault("datet", "31122020");
+                        try {
+                            LocalDateTime dateFrom = LocalDateTime.ofInstant(dateFormat.parse(datef).toInstant(),
+                                    ZoneId.systemDefault());
+                            LocalDateTime dateTo = LocalDateTime.ofInstant(dateFormat.parse(datet).toInstant(),
+                                    ZoneId.systemDefault());
+                            taskList = taskRepository.findAll(TaskSpecification.getTasksByDateTo(dateTo).
+                                            and(TaskSpecification.getTasksByDateFrom(dateFrom)),
+                                    PageRequest.of(page, 10)).getContent();
+                        } catch (ParseException e) {
+                            System.err.println(e.getMessage());
+                            return ResponseEntity.badRequest().build();
+                        }
+                        break;
+                    }
+                    default: {
+                        taskList = taskRepository.findAll(PageRequest.of(page, 10)).getContent();
+                        break;
+                    }
+                }
             }
         }
-
-//        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-//        String datef = params.getOrDefault("datef", "01012000");
-//        String datet = params.getOrDefault("datet", "31122020");
-//
-//        try {
-//            LocalDateTime dateFrom = LocalDateTime.ofInstant(dateFormat.parse(datef).toInstant(),
-//                    ZoneId.systemDefault());
-//            LocalDateTime dateTo = LocalDateTime.ofInstant(dateFormat.parse(datet).toInstant(),
-//                    ZoneId.systemDefault());
-
-            // GET param like /?filter=priority&ptype=0 or /?filter=status&stype=in_progress
-            String filter = params.getOrDefault("filter", "none");
-            Status statusType = Status.valueOf(params.getOrDefault("stype", "new").toUpperCase());
-            int priorityType = Integer.parseInt(params.getOrDefault("ptype", "0"));
-            switch (filter) {
-                case "status": {
-                    taskList = taskRepository.findAll(TaskSpecification.getTasksByStatus(statusType),
-                            PageRequest.of(page, 10)).getContent();
-                    break;
-                }
-                case "priority": {
-                    taskList = taskRepository.findAll(TaskSpecification.getTasksByPriority(priorityType),
-                            PageRequest.of(page, 10)).getContent();
-                    break;
-                }
-//                case "datet": {
-//                    taskList = taskRepository.findAll(TaskSpecification.getTasksByDateTo(dateTo),
-//                            PageRequest.of(page, 10)).getContent();
-//                    break;
-//                }
-                default: {
-                    taskList = taskRepository.findAll(PageRequest.of(page, 10)).getContent();
-                    break;
-                }
-            }
-//        } catch (ParseException e) {
-//            System.err.println(e.getMessage());
-//        }
-
         return responseTaskList(taskList);
     }
 

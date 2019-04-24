@@ -25,7 +25,14 @@ public class TaskSpecification {
 
     public static Specification<Task> getTasksByDateTo(LocalDateTime dateTo) {
         return (Specification<Task>) (root, criteriaQuery, criteriaBuilder) -> {
-            Predicate predicate = criteriaBuilder.lessThan(root.get("dateOfCreation"), dateTo);
+            Predicate predicate = criteriaBuilder.lessThanOrEqualTo(root.get("dateOfCreation"), dateTo);
+            return predicate;
+        };
+    }
+
+    public static Specification<Task> getTasksByDateFrom(LocalDateTime dateFrom) {
+        return (Specification<Task>) (root, criteriaQuery, criteriaBuilder) -> {
+            Predicate predicate = criteriaBuilder.greaterThanOrEqualTo(root.get("dateOfCreation"), dateFrom);
             return predicate;
         };
     }
