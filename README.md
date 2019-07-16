@@ -1,3 +1,4 @@
+https://app.codacy.com/app/vitalynec/bugtracker/file/36364068075/issues/source?bid=13461999&fileBranchId=13461999#l4
 ## Тестовое задание «Bug tracking»
 
 ### Окружение
