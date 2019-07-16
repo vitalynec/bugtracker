@@ -1,4 +1,4 @@
-https://app.codacy.com/app/vitalynec/bugtracker/file/36364068075/issues/source?bid=13461999&fileBranchId=13461999#l4
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/a742cf07f4a4454cae3753e7bcbde69f)](https://www.codacy.com/app/vitalynec/bugtracker?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=vitalynec/bugtracker&amp;utm_campaign=Badge_Grade)
 ## Тестовое задание «Bug tracking»
 
 ### Окружение
