@@ -2,12 +2,8 @@ package com.vitane.bugtracker.controller;
 
 import com.vitane.bugtracker.entity.Project;
 import com.vitane.bugtracker.entity.Task;
-import com.vitane.bugtracker.repository.ProjectRepository;
-import com.vitane.bugtracker.repository.TaskRepository;
 import com.vitane.bugtracker.service.ProjectService;
 import com.vitane.bugtracker.service.TaskService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
