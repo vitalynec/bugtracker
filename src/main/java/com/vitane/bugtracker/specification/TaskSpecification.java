@@ -1,7 +1,7 @@
-package com.vitane.bugtracker.Specification;
+package com.vitane.bugtracker.specification;
 
-import com.vitane.bugtracker.Entity.Status;
-import com.vitane.bugtracker.Entity.Task;
+import com.vitane.bugtracker.entity.Status;
+import com.vitane.bugtracker.entity.Task;
 import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.*;

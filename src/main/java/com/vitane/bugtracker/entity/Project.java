@@ -1,4 +1,4 @@
-package com.vitane.bugtracker.Entity;
+package com.vitane.bugtracker.entity;
 
 import lombok.*;
 import org.hibernate.annotations.Type;
@@ -10,29 +10,26 @@ import com.fasterxml.jackson.annotation.*;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
-@Table(name = "Task")
+@Table(name = "project")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Task implements Serializable {
+public class Project implements Serializable {
 
     @Id
     @GeneratedValue
     @Column(nullable = false, updatable = false)
-    private int id;
+    int id;
 
-    @ManyToOne
-    @JoinColumn(name = "project_id", nullable = false)
-    @JsonManagedReference
-    private Project project;
-
+    @Column
     private String name;
 
     @Column(columnDefinition = "TEXT")
     private String description;
-    private int priority;
 
     @Column(nullable = false, updatable = false)
     @Temporal(javax.persistence.TemporalType.TIMESTAMP)
@@ -46,7 +43,7 @@ public class Task implements Serializable {
     @UpdateTimestamp
     private LocalDateTime dateOfLastModification;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Status status;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "project")
+    @JsonBackReference
+    private Set<Task> taskList = new HashSet<>();
 }

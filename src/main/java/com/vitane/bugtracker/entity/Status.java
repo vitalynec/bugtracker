@@ -1,4 +1,4 @@
-package com.vitane.bugtracker.Entity;
+package com.vitane.bugtracker.entity;
 
 public enum Status {
     NEW,
