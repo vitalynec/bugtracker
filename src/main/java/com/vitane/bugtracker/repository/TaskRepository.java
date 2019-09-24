@@ -1,7 +1,7 @@
-package com.vitane.bugtracker.Repository;
+package com.vitane.bugtracker.repository;
 
-import com.vitane.bugtracker.Entity.Project;
-import com.vitane.bugtracker.Entity.Task;
+import com.vitane.bugtracker.entity.Project;
+import com.vitane.bugtracker.entity.Task;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
