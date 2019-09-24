@@ -23,13 +23,6 @@ public final class ProjectController {
         this.taskService = taskService;
     }
 
-// TODO: mapping listed-get-request
-// @RequestMapping(method = RequestMethod.GET)
-// public ResponseEntity<List<Project>> getListOfProjects(@RequestParam(required = false, value = "id", defaultValue = "0") int[] id)
-
-// TODO: mapping head-requests
-// @RequestMapping(method = RequestMethod.HEAD)
-
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<List<Project>> getAllProjects(@RequestParam(required = false, value = "page", defaultValue = "0") int page) {
         List<Project> projectList = projectService.findAll(page);
@@ -66,13 +59,10 @@ public final class ProjectController {
     @RequestMapping(method = RequestMethod.PUT, value = {"/{id}/edit", "/{id}"},
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity putProject(@PathVariable int id, @RequestBody Project project) {
-        return changeProject(id, project);
-    }
-
-    @RequestMapping(method = RequestMethod.PATCH, value = {"/{id}/edit", "/{id}"},
-            consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity patchProject(@PathVariable int id, @RequestBody Project project) {
-        return changeProject(id, project);
+        if (projectService.changeProject(id, project)) {
+            return ResponseEntity.noContent().build();
+        } else
+            return ResponseEntity.notFound().build();
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/{id}/tasks")
@@ -86,15 +76,6 @@ public final class ProjectController {
 
     private ResponseEntity deleteProject(int id) {
         if (projectService.deleteById(id)) {
-            return ResponseEntity.noContent().build();
-        } else
-            return ResponseEntity.notFound().build();
-    }
-
-    private ResponseEntity changeProject(int id, Project project) {
-        if (projectService.existsById(id)) {
-            project.setId(id);
-            projectService.save(project);
             return ResponseEntity.noContent().build();
         } else
             return ResponseEntity.notFound().build();

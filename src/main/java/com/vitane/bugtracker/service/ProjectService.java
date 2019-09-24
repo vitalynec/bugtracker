@@ -37,6 +37,15 @@ public class ProjectService {
             return false;
     }
 
+    public boolean changeProject(int id, Project project) {
+        if (existsById(id)) {
+            project.setId(id);
+            save(project);
+            return true;
+        } else
+            return false;
+    }
+
     public void save(Project project) {
         projectRepository.save(project);
     }
