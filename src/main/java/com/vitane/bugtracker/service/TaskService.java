@@ -18,6 +18,7 @@ import java.util.Map;
 public class TaskService {
     private final TaskRepository taskRepository;
     private final TaskServiceUtils taskServiceUtils = new TaskServiceUtils(this);
+    private final int PAGE_SIZE = 10;
 
     @Autowired
     public TaskService(TaskRepository taskRepository) {
@@ -37,16 +38,16 @@ public class TaskService {
 //    }
 
     public List<Task> findAll(Specification<Task> specification, int page) {
-        return taskRepository.findAll(specification, PageRequest.of(page, 10)).getContent();
+        return taskRepository.findAll(specification, PageRequest.of(page, PAGE_SIZE)).getContent();
     }
 
     public List<Task> findAll(int page) {
-        return taskRepository.findAll(PageRequest.of(page, 10)).getContent();
+        return taskRepository.findAll(PageRequest.of(page, PAGE_SIZE)).getContent();
     }
 
     public List<Task> findByProject(Project project, int page) {
         return taskRepository.findByProject(project,
-                PageRequest.of(page, 10)).getContent();
+                PageRequest.of(page, PAGE_SIZE)).getContent();
     }
 
     public boolean putTask(int id, Task task) throws NotFoundException, IllegalArgumentException {
@@ -62,16 +63,14 @@ public class TaskService {
     }
 
     private void save(Task task) throws IllegalArgumentException {
-        if (task.getProject() == null) {
-            throw new IllegalArgumentException("Project is null!");
-        }
-        if (task.getStatus() == null) {
-            throw new IllegalArgumentException("Status is null!");
-        }
+        if (task == null) throw new IllegalArgumentException("Task is null!");
+        if (task.getProject() == null) throw new IllegalArgumentException("Project is null!");
+        if (task.getStatus() == null) throw new IllegalArgumentException("Status is null!");
         taskRepository.save(task);
     }
 
     public void addNewTask(Task task) {
+        if (task == null) throw new IllegalArgumentException("Task is null!");
         task.setStatus(Status.NEW);
         save(task);
     }
