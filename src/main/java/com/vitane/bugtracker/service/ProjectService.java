@@ -1,6 +1,7 @@
 package com.vitane.bugtracker.service;
 
 import com.vitane.bugtracker.entity.Project;
+import com.vitane.bugtracker.exception.NotFoundException;
 import com.vitane.bugtracker.repository.ProjectRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -21,16 +22,18 @@ public class ProjectService {
         return projectRepository.findAll(PageRequest.of(page, 10)).getContent();
     }
 
-    public Project findProjectById(int id) {
-        return projectRepository.findProjectById(id);
+    public Project findProjectById(int id) throws NotFoundException {
+        if (existsById(id)) {
+            return projectRepository.findProjectById(id);
+        } else throw new NotFoundException(String.format("Project with id %d is not found!", id));
     }
 
-    public boolean existsById(int id) {
+    private boolean existsById(int id) {
         return projectRepository.existsById(id);
     }
 
     public boolean deleteById(int id) {
-        if (projectRepository.existsById(id)) {
+        if (existsById(id)) {
             projectRepository.deleteById(id);
             return true;
         } else

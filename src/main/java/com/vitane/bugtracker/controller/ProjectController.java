@@ -2,6 +2,7 @@ package com.vitane.bugtracker.controller;
 
 import com.vitane.bugtracker.entity.Project;
 import com.vitane.bugtracker.entity.Task;
+import com.vitane.bugtracker.exception.NotFoundException;
 import com.vitane.bugtracker.service.ProjectService;
 import com.vitane.bugtracker.service.TaskService;
 import org.springframework.http.MediaType;
@@ -26,6 +27,9 @@ public final class ProjectController {
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<List<Project>> getAllProjects(@RequestParam(required = false, value = "page", defaultValue = "0") int page) {
         List<Project> projectList = projectService.findAll(page);
+        if (projectList == null) {
+            return ResponseEntity.badRequest().build();
+        }
         if (projectList.isEmpty())
             return ResponseEntity.notFound().build();
         else
@@ -34,10 +38,11 @@ public final class ProjectController {
 
     @RequestMapping(method = RequestMethod.GET, value = "/{id}")
     public ResponseEntity<Project> getById(@PathVariable int id) {
-        if (projectService.existsById(id))
+        try {
             return ResponseEntity.ok(projectService.findProjectById(id));
-        else
+        } catch (NotFoundException e) {
             return ResponseEntity.notFound().build();
+        }
     }
 
     @RequestMapping(method = RequestMethod.DELETE, value = {"/{id}/edit", "/{id}"}, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -67,11 +72,17 @@ public final class ProjectController {
 
     @RequestMapping(method = RequestMethod.GET, value = "/{id}/tasks")
     public ResponseEntity<List<Task>> getTaskListByProjectId(@PathVariable int id, @RequestParam(required = false, defaultValue = "0", value = "page") int page) {
-        List<Task> taskList = taskService.findByProject(projectService.findProjectById(id), page);
-        if (taskList.isEmpty())
+        List<Task> taskList;
+        try {
+            taskList = taskService.findByProject(projectService.findProjectById(id), page);
+        } catch (NotFoundException e) {
             return ResponseEntity.notFound().build();
-        else
+        }
+        if (taskList == null || taskList.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        } else {
             return ResponseEntity.ok(taskList);
+        }
     }
 
     private ResponseEntity deleteProject(int id) {
