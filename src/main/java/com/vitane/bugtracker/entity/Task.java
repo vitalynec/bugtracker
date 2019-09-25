@@ -32,6 +32,7 @@ public class Task implements Serializable {
 
     @Column(columnDefinition = "TEXT")
     private String description;
+    @Column(nullable = false)
     private int priority;
 
     @Column(nullable = false, updatable = false)
