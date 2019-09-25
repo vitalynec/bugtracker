@@ -13,6 +13,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class TaskServiceUtils {
@@ -31,37 +32,32 @@ public class TaskServiceUtils {
         this.taskService = taskService;
     }
 
-    List<Task> execute(Map<String, String> params) {
+    List<Task> execute(Map<String, String> params) throws ParseException {
         initParameters(params);
-        taskList = new ArrayList<>();
         if ("none".equalsIgnoreCase(filter)) {
             taskList = taskService.findAll(page);
         } else {
-            taskList = getAllWithFilter();
+            taskList = new ArrayList<>(getAllWithFilter());
         }
-        taskList = sortingTaskList();
+        taskList = new ArrayList<>(sortingTaskList());
         return taskList;
     }
 
-    private void initParameters(Map<String, String> params) {
+    private void initParameters(Map<String, String> params) throws ParseException {
         this.page = Integer.parseInt(params.getOrDefault("page", "0"));
         this.sort = params.getOrDefault("sort", "none");
         this.filter = params.getOrDefault("filter", "none");
         this.statusType = Status.valueOf(params.getOrDefault("stype", "new").toUpperCase());
         this.priorityType = Integer.parseInt(params.getOrDefault("ptype", "0"));
 
-        try {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("ddMMyyyy");
-            String datef = params.getOrDefault("datef", "01012000");
-            String datet = params.getOrDefault("datet", "31122020");
-            Instant instantFrom = dateFormat.parse(datef).toInstant();
-            Instant instantTo = dateFormat.parse(datet).toInstant();
-            ZoneId zone = ZoneId.systemDefault();
-            this.dateFrom = LocalDateTime.ofInstant(instantFrom, zone);
-            this.dateTo = LocalDateTime.ofInstant(instantTo, zone);
-        } catch (ParseException e) {
-            System.err.println(e.getMessage());
-        }
+        SimpleDateFormat dateFormat = new SimpleDateFormat("ddMMyyyy");
+        String datef = params.getOrDefault("datef", "01012000");
+        String datet = params.getOrDefault("datet", "31122020");
+        Instant instantFrom = dateFormat.parse(datef).toInstant();
+        Instant instantTo = dateFormat.parse(datet).toInstant();
+        ZoneId zone = ZoneId.systemDefault();
+        this.dateFrom = LocalDateTime.ofInstant(instantFrom, zone);
+        this.dateTo = LocalDateTime.ofInstant(instantTo, zone);
     }
 
     private List<Task> getAllWithFilter() {
@@ -82,17 +78,12 @@ public class TaskServiceUtils {
 
     private List<Task> sortingTaskList() {
         Map<String, Command> sortCommands = new HashMap<>();
-        sortCommands.put("date", () -> {
-            taskList.sort(Comparator.comparing(Task::getDateOfCreation));
-            return taskList;
-        });
-        sortCommands.put("priority", () -> {
-            taskList.sort(Comparator.comparingInt(Task::getPriority));
-            return taskList;
-        });
+        sortCommands.put("date", () ->
+                taskList.stream().sorted(Comparator.comparing(Task::getDateOfCreation)).collect(Collectors.toList()));
+        sortCommands.put("priority", () ->
+                taskList.stream().sorted(Comparator.comparingInt(Task::getPriority)).collect(Collectors.toList()));
         if (sortCommands.containsKey(sort.toLowerCase()))
             taskList = sortCommands.get(sort.toLowerCase()).execute();
-
         return taskList;
     }
 }
